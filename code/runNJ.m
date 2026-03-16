@@ -1,0 +1,12 @@
+function [F_NJ, T_NJ] = runNJ(D,algParam)
+n = size(D,1);
+phy = seqneighjoin(D);
+leafList = "Leaf "  + (1:n);
+T_NJ = phytree2digraph(phy,leafList);
+T_NJ.Edges.Weight = [];
+F_NJ = calcObjMatrix(T_NJ,D,algParam.unrooted); 
+Tunr_NJ = rooted2unrooted(T_NJ);
+oldNames = Tunr_NJ.Nodes.Name;
+newNames = regexprep(oldNames, 'Leaf', '');
+newNames = regexprep(newNames, 'Branch', 'B');
+Tunr_NJ.Nodes.Name = newNames;
