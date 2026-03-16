@@ -20,3 +20,9 @@ To run SDPTree algorithm, call the function SDPtree with the required parameters
     Possible values:
      - `'sep'` : select leaves unseparable at maximum number of layers
      - `'prof'` : select leaves whose distance profiles to the remaining leaves are most similar
+* ``fmeFolder`` : location of fastME executable
+
+### Output: 
+* ``out`` : structure with fields
+     - `out.T` : tree (as a digraph object)
+     - `'out.F'` : value of the objective function
