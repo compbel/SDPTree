@@ -44,5 +44,5 @@ mergeType = 'sep';
 % mergeType = 'prof';
 nMerge = 2;      
 
-out = SDPtree(D,maxDepth,mergeType,fmeFolder);
+out = SDPtree(D,maxDepth,mergeType,nMerge,fmeFolder);
 ```
