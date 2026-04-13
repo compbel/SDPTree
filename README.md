@@ -11,7 +11,7 @@ A Semidefinite Programming Relaxation-based Method for Balanced Minimum Evolutio
 
 To run SDPTree algorithm, call the function SDPtree with the required parameters.
 
-```out = SDPtree(D,maxDepth,mergeType,fmeFolder)```
+```out = SDPtree(D,maxDepth,mergeType,nMerge,fmeFolder)```
 
 ### Input: 
 * ``D`` : dissimilarity matrix
