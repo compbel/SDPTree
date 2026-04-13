@@ -2,6 +2,7 @@ function out = solveSDP(D,algParam)
 
     n = size(D,1);
     min_n_curr = 5;
+    nJoin = algParam.nMergeCher;
     
     s = zeros(2*n-2,1);
     t = zeros(2*n-2,1);
@@ -11,10 +12,16 @@ function out = solveSDP(D,algParam)
     e = 1;
     n_curr = n;
     L_curr = algParam.maxDepth;
-    for i = 1:(n-1)
+    i = 1;
+    while i <= n-1
         i
         if n_curr > min_n_curr 
-            L_curr = ceil(n_curr/2);
+            if strcmp(algParam.maxDepthType,'lin')
+                L_curr = ceil(n_curr/2);
+            end
+            if strcmp(algParam.maxDepthType,'log')
+                L_curr = min(ceil(2*log2(n_curr)),ceil(n_curr/2));
+            end
 
             beta = zeros(L_curr+1,1);
             beta(1) = 2;
@@ -29,12 +36,9 @@ function out = solveSDP(D,algParam)
             nCher = zeros(n_curr,n_curr);
             Btot = zeros(n_curr,n_curr);
             K = zeros(n_curr,n_curr);
-            AMtot = zeros(n_curr,n_curr);
             for j = 2:length(B_opt)
                 B = abs(B_opt{j});
                 Y = Y_opt{j};
-                % Z_prod = Zprod_opt{j};
-                Z_prod = Zprod_opt;
                 Bnorm = B;
                 scale = max(Bnorm(~eye(n_curr)),[],'all');
                 Bnorm(~eye(size(Bnorm,1))) = Bnorm(~eye(n_curr)) / scale;
@@ -51,7 +55,7 @@ function out = solveSDP(D,algParam)
                     save(fn,'ME','-append'); 
                     rethrow(ME);
                 end
-                if nClass == 1
+                if (nClass == 1) && (j >= ceil(log2(n_curr)))
                     break;
                 end
                  
@@ -69,26 +73,41 @@ function out = solveSDP(D,algParam)
             Twin(1:n_curr+1:end) = Inf;
         
             nCher(1:n_curr+1:end) = -Inf;
-            Badj = (AMtot>0).*Btot;
-            G1 = graph(Badj);
     
             if strcmp(algParam.heurRuleCh,'sep')
-                [v1,v2] = findedge(G1); 
-                idx = find(degree(G1,v1)==1 & degree(G1,v2)==1);                 
-                if ~isempty(idx) 
-                    [~,k] = max(G1.Edges.Weight(idx)); 
-                    r = v1(idx(k));
-                    c = v2(idx(k));
-                else
-                    [r,c] = find(nCher == max(nCher(:)));                       
-                end
+                % [r,c] = find(nCher == max(nCher(:)));
+                nCher = nCher + nCher';
+                match = greedyMatching(nCher, nJoin, 'maximize');
             end
 
             if strcmp(algParam.heurRuleCh,'prof')
-                [r,c] = find(Twin == min(Twin(:))); 
+                % [r,c] = find(Twin == min(Twin(:))); 
+                match = greedyMatching(Twin, nJoin, 'minimize');
             end
-            leavesCurrPrev = leavesCurr;       
-            mergeCher;
+
+            match = sort(match,2);
+            for me = 1:size(match,1)
+                u = match(me,1);
+                v = match(me,2);
+                s(e) = n+i; s(e+1) = n+i;
+                t(e) = nodeCurr(u); t(e+1) = nodeCurr(v);
+                nodeCurr(u) = n+i;
+                e = e+2;
+                n_curr = n_curr-1;
+                i = i+1;
+                % G = digraph(s(1:(e-1)),t(1:(e-1)));
+                % figure; plot(G,'Layout','layered');
+                if i == n-1
+                    break;
+                end
+            end
+            nodeCurr(match(:,2)) = [];
+            leavesCurr(match(:,2)) = [];
+            Dcurr(match(:,1),:) = (Dcurr(match(:,1),:)+Dcurr(match(:,2),:))/2;
+            Dcurr(:,match(:,1)) = (Dcurr(:,match(:,1))+Dcurr(:,match(:,2)))/2;
+            Dcurr(:,match(:,2)) = []; 
+            Dcurr(match(:,2),:) = [];
+            Dcurr = Dcurr - diag(diag(Dcurr));
         else
             [~, T] = runNJ(Dcurr,algParam);
             root = find(indegree(T)==0);
@@ -119,21 +138,4 @@ function out = solveSDP(D,algParam)
     out.F = F_SDP;
     out.status = 1;
     
-    function mergeCher
-        u = min([r(1),c(1)]);
-        v = max([r(1),c(1)]);
-        s(e) = n+i; s(e+1) = n+i;
-        t(e) = nodeCurr(u); t(e+1) = nodeCurr(v);
-        nodeCurr(u) = n+i;
-        nodeCurr(v) = [];
-        leavesCurr(v) = [];
-        Dcurr(u,:) = (Dcurr(u,:)+Dcurr(v,:))/2;
-        Dcurr(:,u) = (Dcurr(:,u)+Dcurr(:,v))/2;
-        Dcurr(:,v) = []; Dcurr(v,:) = [];
-        Dcurr(u,u) = 0;
-        e = e+2;
-        n_curr = n_curr-1;
-    end
-
-end
 

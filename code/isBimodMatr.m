@@ -1,6 +1,7 @@
 function [thr,nClass, prob] = isBimodMatr(B,prob_cut,diff_cut)
         
         n_curr = size(B,1);
+
         Bvec = sort(B(~eye(n_curr)));
         mvec = min(Bvec);
         Blog = log(B);
@@ -31,7 +32,7 @@ function [thr,nClass, prob] = isBimodMatr(B,prob_cut,diff_cut)
             nClass = 2;
             return;
         end
-        if (prob > prob_cut)||(sum(ind1)<0.2*length(ind1))||(max_diff < diff_cut)
+        if (prob > prob_cut)||(sum(ind1)<0.2*length(ind1)) %||(max_diff < diff_cut)
             nClass = 1;
         else
             nClass = 2;
