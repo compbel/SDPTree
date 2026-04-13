@@ -16,8 +16,9 @@ To run SDPTree algorithm, call the function SDPtree with the required parameters
 ### Input: 
 * ``D`` : dissimilarity matrix
 * ``maxDepth`` : upper bound on the depth of the rooted tree (in the simplest case maxDepth = n-1, where n = size(D,1))
-* ``mergeType`` : heuristics to identify leaves merged at agglomerative rounding step
-    Possible values:
+* ``mergeType`` : heuristics to identify leaves merged at agglomerative rounding step.
+
+  Possible values:
      - `'sep'` : select leaves unseparable at maximum number of layers
      - `'prof'` : select leaves whose distance profiles to the remaining leaves are most similar
 * ``fmeFolder`` : location of fastME executable
