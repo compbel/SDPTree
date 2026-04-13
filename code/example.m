@@ -14,8 +14,12 @@ maxDepth = n-1;            % maximal depth of the tree
 % 'prof': select leaves whose distance profiles to the remaining leaves are most similar
 
 mergeType = 'sep';         
-% mergeType = 'prof';      
+% mergeType = 'prof';  
 
-out = SDPtree(D,maxDepth,mergeType,fmeFolder);
+%number of leaf pairs to be merged at the agglomerative rounding step
+nMerge = 2;  
+
+
+out = SDPtree(D,maxDepth,mergeType,nMerge,fmeFolder);
 
 % out: solution structure. out.T - tree, out.F - value of the objective function
