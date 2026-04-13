@@ -21,6 +21,8 @@ To run SDPTree algorithm, call the function SDPtree with the required parameters
   Possible values:
      - `'sep'` : select leaves unseparable at maximum number of layers
      - `'prof'` : select leaves whose distance profiles to the remaining leaves are most similar
+       
+* ``nMerge`` : number of leaf pairs to be merged at the agglomerative rounding step. Generally, lower number is better for accuracy, and higher number - for running time. Usually, nMerge = 2 or nMerge = 4 work fine.
 * ``fmeFolder`` : location of fastME executable
 
 ### Output: 
@@ -39,7 +41,8 @@ D = squareform(pdist(rand(n,m))); % Eucledian distance matrix for randomly gener
 
 maxDepth = n-1;
 mergeType = 'sep';         
-% mergeType = 'prof';      
+% mergeType = 'prof';
+nMerge = 2;      
 
 out = SDPtree(D,maxDepth,mergeType,fmeFolder);
 ```
